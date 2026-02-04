@@ -13,7 +13,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard Monitoring</h1>
+            <h1 class="text-3xl font-bold text-gray-900">MJ Department Store</h1>
             <p class="text-sm text-gray-500 mt-1">Pantau performa keuangan dan stok seluruh cabang.</p>
         </div>
         
@@ -73,11 +73,99 @@
                 <canvas id="bestProductChart"></canvas>
             </div>
         </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-50 flex items-center justify-between bg-orange-50/50">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">⚠️ Top 10 Produk Kurang Laku (Slow Moving)</h3>
+                    <p class="text-xs text-gray-500 mt-1">Produk dengan perputaran terendah pada periode ini.</p>
+                </div>
+                <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase">Perlu Evaluasi</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-bold">
+                        <tr>
+                            <th class="px-6 py-4">Nama Produk</th>
+                            <th class="px-6 py-4 text-center">Qty Terjual</th>
+                            <th class="px-6 py-4 text-right">Total Omzet</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm">
+                        @foreach($slowMoving as $item)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-gray-900">{{ $item->product_name }}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="font-bold {{ $item->total_qty == 0 ? 'text-red-600' : 'text-gray-700' }}">
+                                    {{ number_format($item->total_qty, 0) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right font-semibold text-gray-600">
+                                Rp {{ number_format($item->total_sales, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($item->total_qty == 0)
+                                    <span class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold uppercase text-nowrap">Tidak Ada Penjualan</span>
+                                @else
+                                    <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-1 rounded font-bold uppercase text-nowrap">Sangat Lambat</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-50 flex items-center justify-between bg-green-50/50">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">🔥 Top 10 Produk Terlaris</h3>
+                    <p class="text-xs text-gray-500 mt-1">Produk dengan perputaran tertinggi pada periode ini.</p>
+                </div>
+                <!-- <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase">Perlu Evaluasi</span> -->
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-bold">
+                        <tr>
+                            <th class="px-6 py-4">Nama Produk</th>
+                            <th class="px-6 py-4 text-center">Qty Terjual</th>
+                            <th class="px-6 py-4 text-right">Total Omzet</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm">
+                        @foreach($bestSelling as $item)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-gray-900">{{ $item->product->product_name }}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="font-bold {{ $item->total_qty == 0 ? 'text-red-600' : 'text-gray-700' }}">
+                                    {{ number_format($item->total_qty, 0) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right font-semibold text-gray-600">
+                                Rp {{ number_format($item->total_sales, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($item->total_qty == 0)
+                                    <span class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold uppercase text-nowrap">Tidak Ada Penjualan</span>
+                                @else
+                                    <span class="text-[10px] bg-green-100 text-black-600 px-2 py-1 rounded font-bold uppercase text-nowrap">Penjualan Bagus</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <!-- <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-50">
                 <h3 class="text-lg font-bold text-gray-800">📊 Detail Produk Terlaris</h3>
             </div>
@@ -101,13 +189,15 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div> -->
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-50">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-gray-800">📈 Tren Penjualan Harian</h3>
+                <span id="page-info" class="text-xs text-gray-500 font-medium"></span>
             </div>
-            <div class="overflow-x-auto">
+            
+            <div class="overflow-x-auto flex-grow">
                 <table class="w-full text-left">
                     <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-bold">
                         <tr>
@@ -115,19 +205,19 @@
                             <th class="px-6 py-4 text-right">Omzet</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 text-sm text-gray-600 font-medium">
-                        @foreach ($dailySales as $item)
-                        <tr>
-                            <td class="px-6 py-4">{{ $item->period }}</td>
-                            <td class="px-6 py-4 text-right text-gray-900">Rp {{ number_format($item->total_sales, 0, ',', '.') }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
+                    <tbody id="daily-sales-body" class="divide-y divide-gray-100 text-sm text-gray-600 font-medium">
+                        </tbody>
                 </table>
+            </div>
+            
+            <div class="p-4 border-t border-gray-50 bg-gray-50/50 flex justify-between items-center">
+                <button id="prev-btn" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold hover:bg-gray-50 disabled:opacity-50 invisible">PREV</button> <!-- di hide dulu-->
+                <div id="page-numbers" class="flex gap-1"></div>
+                <button id="next-btn" class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold hover:bg-gray-50 disabled:opacity-50 invisible">NEXT</button> <!-- di hide dulu-->
             </div>
         </div>
 
-        <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-50">
                 <h3 class="text-lg font-bold text-gray-800">🏢 Performa per Cabang</h3>
             </div>
@@ -189,5 +279,66 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
     });
 </script>
+
+<script>
+    // Data dari Laravel dikirim ke JS sebagai array objek
+    const allDailyData = @json($dailySales);
+    const rowsPerPage = 5;
+    let currentPage = 1;
+
+    function renderTable(page) {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedData = allDailyData.slice(start, end);
+        
+        const tbody = document.getElementById('daily-sales-body');
+        tbody.innerHTML = '';
+
+        if (paginatedData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-10 text-center text-gray-400">Tidak ada data.</td></tr>';
+            return;
+        }
+
+        paginatedData.forEach(item => {
+            const formattedSales = new Intl.NumberFormat('id-ID').format(item.total_sales);
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4">${item.period}</td>
+                    <td class="px-6 py-4 text-right text-gray-900 font-bold">Rp ${formattedSales}</td>
+                </tr>
+            `;
+        });
+
+        updatePaginationControls();
+    }
+
+    function updatePaginationControls() {
+        const totalPages = Math.ceil(allDailyData.length / rowsPerPage);
+        document.getElementById('page-info').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
+        
+        document.getElementById('prev-btn').disabled = currentPage === 1;
+        document.getElementById('next-btn').disabled = currentPage === totalPages || totalPages === 0;
+
+        // Render nomor halaman sederhana
+        const pageNumbers = document.getElementById('page-numbers');
+        pageNumbers.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            if (i <= 3 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.className = `w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-colors ${i === currentPage ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`;
+                btn.onclick = () => { currentPage = i; renderTable(currentPage); };
+                pageNumbers.appendChild(btn);
+            }
+        }
+    }
+
+    document.getElementById('prev-btn').onclick = () => { if (currentPage > 1) { currentPage--; renderTable(currentPage); } };
+    document.getElementById('next-btn').onclick = () => { if (currentPage < Math.ceil(allDailyData.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } };
+
+    // Jalankan render pertama kali
+    renderTable(currentPage);
+</script>
+
 </body>
 </html>

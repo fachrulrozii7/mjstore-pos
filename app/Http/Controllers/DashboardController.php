@@ -20,7 +20,7 @@ class DashboardController extends Controller
         // 1. Prepare Filters
         $filters = [
             'branch_id'  => $request->get('branch_id'),
-            'start_date' => $request->get('start_date', now()->startOfMonth()->toDateString()),
+            'start_date' => $request->get('start_date', now()->toDateString()),
             'end_date'   => $request->get('end_date', now()->toDateString()),
         ];
 
@@ -30,6 +30,7 @@ class DashboardController extends Controller
         $dailySales       = DashboardService::getSalesTrend($filters);
         $profitPerBranch  = DashboardService::getProfitPerBranch($filters);
         $branches         = MasterBranch::where('is_active', true)->get();
+        $slowMoving       = DashboardService::getSlowMovingProducts($filters, 10);
 
         // 3. Mapping data for Chart (Comparison Chart)
         $chartData = $revenuePerBranch->map(function ($rev) use ($profitPerBranch) {
@@ -53,7 +54,8 @@ class DashboardController extends Controller
             'totalTransactions' => $revenuePerBranch->sum('total_transactions'),
             'dailySales'        => $dailySales,         
             'branches'          => $branches, 
-            'filters'           => $filters,  
+            'filters'           => $filters, 
+            'slowMoving'        => $slowMoving, 
             'chartData'         => $chartData
         ]);
     }

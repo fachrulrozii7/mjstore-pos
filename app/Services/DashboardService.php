@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Inventory;
 use App\Models\MasterBranch;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
 class DashboardService
@@ -97,5 +98,37 @@ class DashboardService
             ->groupBy('transaction.branch_id');
 
         return self::applyFilters($query, $filters)->get();
+    }
+
+    public static function getSlowMovingProducts($filters = [], $limit = 10)
+    {
+        // Mengambil semua produk dan menjumlahkan qty terjual dari tabel transaction_details
+        $query = Product::leftJoin('transaction_detail', 'product.id', '=', 'transaction_detail.product_id')
+            ->leftJoin('transaction', 'transaction.id', '=', 'transaction_detail.transaction_id')
+            ->select(
+                'product.product_name',
+                DB::raw('COALESCE(SUM(transaction_detail.qty), 0) as total_qty'),
+                DB::raw('COALESCE(SUM(transaction_detail.subtotal), 0) as total_sales')
+            )
+            // Filter status PAID agar pembatalan tidak dihitung sebagai penjualan
+            ->where(function($q) {
+                $q->where('transaction.status', 'PAID')
+                ->orWhereNull('transaction.status');
+            });
+
+        // Terapkan filter cabang jika ada
+        if (!empty($filters['branch_id'])) {
+            $query->where('transaction.branch_id', $filters['branch_id']);
+        }
+
+        // Terapkan filter tanggal jika ada
+        if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
+            $query->whereBetween('transaction.transaction_date', [$filters['start_date'].' 00:00:00', $filters['end_date'].' 23:59:59']);
+        }
+
+        return $query->groupBy('product.id', 'product.product_name')
+            ->orderBy('total_qty', 'asc') // Urutkan dari yang paling sedikit
+            ->limit($limit)
+            ->get();
     }
 }
