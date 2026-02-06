@@ -26,7 +26,7 @@
                 </a>
 
                 <p x-show="sidebarOpen" class="text-[10px] font-bold text-gray-400 uppercase px-3 mt-6 mb-2">Transaksi</p>
-                <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 transition-all">
+                <a href="{{ route('pos.index') }}" class="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                     <span x-show="sidebarOpen" class="text-sm font-semibold">Menu Kasir</span>
                 </a>
@@ -74,7 +74,13 @@
                 <div class="flex items-center gap-4">
                     <span class="text-xs font-medium text-gray-400">{{ date('l, d F Y') }}</span>
                     <div class="h-4 w-px bg-gray-200"></div>
-                    <button class="text-sm font-semibold text-red-500 hover:text-red-600 transition-colors">Keluar</button>
+                    
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="cursor-pointer text-sm font-semibold text-red-500 hover:text-red-600 transition-colors">
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </header>
 
