@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+@extends('layouts.app')
+<!-- <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -8,8 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
 </head>
-<body class="bg-gray-50 font-[Instrument Sans] antialiased">
-
+<body class="bg-gray-50 font-[Instrument Sans] antialiased"> -->
+@section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>
@@ -246,99 +247,107 @@
     </div>
 </div>
 
+@endsection
+
+@push('scripts')
 <script>
-    // 1. Chart Keuangan per Cabang
-    const ctxFinance = document.getElementById('branchComparisonChart').getContext('2d');
-    const rawChartData = @json($chartData);
-    
-    new Chart(ctxFinance, {
-        type: 'bar',
-        data: {
-            labels: rawChartData.map(i => i.label),
-            datasets: [
-                { label: 'Omzet', data: rawChartData.map(i => i.revenue), backgroundColor: '#3b82f6', borderRadius: 8 },
-                { label: 'Profit', data: rawChartData.map(i => i.profit), backgroundColor: '#10b981', borderRadius: 8 }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-    });
-
-    // 2. Chart Produk Terlaris
-    const ctxProduct = document.getElementById('bestProductChart').getContext('2d');
-    const bestSellingData = @json($bestSelling);
-    
-    new Chart(ctxProduct, {
-        type: 'doughnut',
-        data: {
-            labels: bestSellingData.map(i => i.product.product_name),
-            datasets: [{
-                data: bestSellingData.map(i => i.total_qty),
-                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-    });
-</script>
-
-<script>
-    // Data dari Laravel dikirim ke JS sebagai array objek
-    const allDailyData = @json($dailySales);
-    const rowsPerPage = 5;
-    let currentPage = 1;
-
-    function renderTable(page) {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginatedData = allDailyData.slice(start, end);
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Chart Keuangan per Cabang
+        const ctxFinance = document.getElementById('branchComparisonChart').getContext('2d');
+        const rawChartData = @json($chartData);
         
-        const tbody = document.getElementById('daily-sales-body');
-        tbody.innerHTML = '';
-
-        if (paginatedData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-10 text-center text-gray-400">Tidak ada data.</td></tr>';
-            return;
-        }
-
-        paginatedData.forEach(item => {
-            const formattedSales = new Intl.NumberFormat('id-ID').format(item.total_sales);
-            tbody.innerHTML += `
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4">${item.period}</td>
-                    <td class="px-6 py-4 text-right text-gray-900 font-bold">Rp ${formattedSales}</td>
-                </tr>
-            `;
+        new Chart(ctxFinance, {
+            type: 'bar',
+            data: {
+                labels: rawChartData.map(i => i.label),
+                datasets: [
+                    { label: 'Omzet', data: rawChartData.map(i => i.revenue), backgroundColor: '#3b82f6', borderRadius: 8 },
+                    { label: 'Profit', data: rawChartData.map(i => i.profit), backgroundColor: '#10b981', borderRadius: 8 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
 
-        updatePaginationControls();
-    }
-
-    function updatePaginationControls() {
-        const totalPages = Math.ceil(allDailyData.length / rowsPerPage);
-        document.getElementById('page-info').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
+        // 2. Chart Produk Terlaris
+        const ctxProduct = document.getElementById('bestProductChart').getContext('2d');
+        const bestSellingData = @json($bestSelling);
         
-        document.getElementById('prev-btn').disabled = currentPage === 1;
-        document.getElementById('next-btn').disabled = currentPage === totalPages || totalPages === 0;
-
-        // Render nomor halaman sederhana
-        const pageNumbers = document.getElementById('page-numbers');
-        pageNumbers.innerHTML = '';
-        for (let i = 1; i <= totalPages; i++) {
-            if (i <= 3 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                const btn = document.createElement('button');
-                btn.innerText = i;
-                btn.className = `w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-colors ${i === currentPage ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`;
-                btn.onclick = () => { currentPage = i; renderTable(currentPage); };
-                pageNumbers.appendChild(btn);
-            }
-        }
-    }
-
-    document.getElementById('prev-btn').onclick = () => { if (currentPage > 1) { currentPage--; renderTable(currentPage); } };
-    document.getElementById('next-btn').onclick = () => { if (currentPage < Math.ceil(allDailyData.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } };
-
-    // Jalankan render pertama kali
-    renderTable(currentPage);
+        new Chart(ctxProduct, {
+            type: 'doughnut',
+            data: {
+                labels: bestSellingData.map(i => i.product.product_name),
+                datasets: [{
+                    data: bestSellingData.map(i => i.total_qty),
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    });
 </script>
 
-</body>
-</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Data dari Laravel dikirim ke JS sebagai array objek
+        const allDailyData = @json($dailySales);
+        const rowsPerPage = 5;
+        let currentPage = 1;
+
+        function renderTable(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = allDailyData.slice(start, end);
+            
+            const tbody = document.getElementById('daily-sales-body');
+            tbody.innerHTML = '';
+
+            if (paginatedData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-10 text-center text-gray-400">Tidak ada data.</td></tr>';
+                return;
+            }
+
+            paginatedData.forEach(item => {
+                const formattedSales = new Intl.NumberFormat('id-ID').format(item.total_sales);
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">${item.period}</td>
+                        <td class="px-6 py-4 text-right text-gray-900 font-bold">Rp ${formattedSales}</td>
+                    </tr>
+                `;
+            });
+
+            updatePaginationControls();
+        }
+
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(allDailyData.length / rowsPerPage);
+            document.getElementById('page-info').innerText = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages || totalPages === 0;
+
+            // Render nomor halaman sederhana
+            const pageNumbers = document.getElementById('page-numbers');
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                if (i <= 3 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const btn = document.createElement('button');
+                    btn.innerText = i;
+                    btn.className = `w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-colors ${i === currentPage ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`;
+                    btn.onclick = () => { currentPage = i; renderTable(currentPage); };
+                    pageNumbers.appendChild(btn);
+                }
+            }
+        }
+
+        document.getElementById('prev-btn').onclick = () => { if (currentPage > 1) { currentPage--; renderTable(currentPage); } };
+        document.getElementById('next-btn').onclick = () => { if (currentPage < Math.ceil(allDailyData.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } };
+
+        // Jalankan render pertama kali
+        renderTable(currentPage);
+    
+    });
+</script>
+@endpush
+<!-- </body>
+</html> -->
