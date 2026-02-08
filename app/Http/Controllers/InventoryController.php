@@ -9,7 +9,7 @@ use App\Models\MasterBranch;
 class InventoryController extends Controller
 {
     public function index(Request $request) { 
-       $branches = MasterBranch::all();
+        $branches = MasterBranch::all();
         $selectedBranch = $request->get('branch_id', $branches->first()->id ?? null);
 
         $inventory = Inventory::withProductData() // Ambil data join dari Model

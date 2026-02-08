@@ -11,30 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Kita gunakan dropIfExists agar jika tabel sudah ada, Laravel akan menghapusnya dulu
+        // Ini solusi untuk error "Table already exists" yang Anda alami tadi.
+        Schema::dropIfExists('users');
+
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+            $table->integer('id', true); // id int(11) NOT NULL AUTO_INCREMENT
+            $table->string('username', 50)->default('0');
+            $table->string('branch_id', 10)->default('0');
+            $table->string('role', 10)->default('NEW');
+            $table->string('name', 50)->default('0');
+            $table->string('password', 100)->default('0');
+            $table->string('email', 50)->default('0');
+            $table->enum('is_active', ['0', '1'])->default('0');
+            $table->string('group', 50)->default('0');
+            $table->timestamps(); // Mengcover created_at dan updated_at
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+            // Menambahkan index sesuai SQL Anda
+            $table->index('role', 'username'); 
         });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
+        
     }
 
     /**

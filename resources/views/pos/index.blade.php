@@ -113,7 +113,6 @@ function scannerSystem() {
             if (!code) return;
             // Cari berdasarkan product_id/Barcode
             const product = this.products.find(p => p.product_id === code);
-            
             if (product) {
                 let existing = this.cart.find(i => i.product_id === code);
                 if (existing) {

@@ -14,7 +14,10 @@ class PosController extends Controller
     {
         // Kita ambil cabang user yang login (atau default ke pusat)
         $branchId = auth()->user()->branch_id ?? 1; 
-        
+        $role = auth()->user()->role; 
+        if($role == 'root'){
+            $branchId = 1;
+        }
         // Ambil produk yang stoknya > 0 di cabang tersebut
         $products = Product::whereHas('inventories', function($q) use ($branchId) {
             $q->where('branch_id', $branchId)->where('stock', '>', 0);
