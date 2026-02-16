@@ -31,9 +31,9 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                     <span x-show="sidebarOpen" class="text-sm font-semibold">Menu Kasir</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 transition-all">
+                <a href="{{ route('manual_sales.index') }}" class="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    <span x-show="sidebarOpen" class="text-sm font-semibold">Penjualan Manual</span>
+                    <span x-show="sidebarOpen" class="text-sm font-semibold">Nota Susulan</span>
                 </a>
                 @endif
 
@@ -48,6 +48,12 @@
                     </svg>
                     <span x-show="sidebarOpen" class="text-sm font-semibold">Stock Produk</span>
                 </a>
+                <a href="{{ route('master.index') }}" class="flex items-center gap-3 p-3 rounded-xl {{ Request::is('master*') ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50' }} transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="text-sm font-semibold">Master Data</span>
+                </a>                
                 @endif
                 
                 @if(\App\Models\RolePermission::canAccess('reports'))

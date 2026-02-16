@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
-    protected $table = 'inventory';
+    protected $table = 'mj_inventory';
+    protected $fillable = [
+        'branch_id',
+        'product_id',
+        'stock',
+        'min_stock',
+    ];
 
     public function branch()
     {
@@ -25,15 +31,15 @@ class Inventory extends Model
 
     public function scopeWithProductData($query)
     {
-        return $query->join('product', 'inventory.product_id', '=', 'product.id')
-                     ->select('inventory.*', 'product.product_name', 'product.product_id', 'product.unit', 'product.category');
+        return $query->join('mj_master_product', 'mj_inventory.product_id', '=', 'mj_master_product.id')
+                     ->select('mj_inventory.*', 'mj_master_product.product_name', 'mj_master_product.product_id', 'mj_master_product.unit', 'mj_master_product.category_id');
     }
 
     public function scopeSearchProduct($query, $term)
     {
         return $query->when($term, function ($q) use ($term) {
-            $q->where('product.product_name', 'like', "%{$term}%")
-              ->orWhere('product.product_id', 'like', "%{$term}%");
+            $q->where('mj_master_product.product_name', 'like', "%{$term}%")
+              ->orWhere('mj_master_product.product_id', 'like', "%{$term}%");
         });
     }
 
@@ -41,8 +47,8 @@ class Inventory extends Model
     {
         $order = ($order === 'desc') ? 'desc' : 'asc';
         if ($field === 'stock') {
-            return $query->orderBy('inventory.stock', $order);
+            return $query->orderBy('mj_inventory.stock', $order);
         }
-        return $query->orderBy('product.product_name', $order);
+        return $query->orderBy('mj_master_product.product_name', $order);
     }
 }

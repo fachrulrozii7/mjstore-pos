@@ -5,20 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Brand;
 
 class Product extends Model
 {
     use HasFactory;
 
-    protected $table = 'product';
+    protected $table = 'mj_master_product';
     // Add all the fields from your form validation here
     protected $fillable = [
         'product_name',
         'product_id',
         'unit',
         'category',
+        'brand',
+        'color',
+        'size', 
         'purchase_price',
         'selling_price',
+        'is_active',
     ];
 
     public function inventories()
@@ -55,5 +60,16 @@ class Product extends Model
         $order = ($order === 'desc') ? 'desc' : 'asc';
 
         return $query->orderBy($field, $order);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    // Hubungan ke Merk
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 }

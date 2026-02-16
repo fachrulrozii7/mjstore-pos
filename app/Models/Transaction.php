@@ -7,10 +7,23 @@ use Illuminate\Support\Facades\DB;
 
 class Transaction extends Model
 {
-    protected $table = 'transaction';
+    protected $table = 'mj_transaction';
     protected $guarded = ['id'];
     protected $dates = ['transaction_date'];
+    // app/Models/Transaction.php
 
+    protected $fillable = [
+        'transaction_id',
+        'transaction_date',
+        'branch_id',
+        'user_id',
+        'total_amount',
+        'paid_amount',   // <--- Pastikan ini ada
+        'change_amount', // <--- Pastikan ini ada
+        'payment_method',
+        'status',
+        'created_at'
+    ];
     public function branch()
     {
         return $this->belongsTo(MasterBranch::class, 'branch_id');

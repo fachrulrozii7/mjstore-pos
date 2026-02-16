@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MasterBranch extends Model
 {
-    protected $table = 'master_branch';
+    protected $table = 'mj_master_branch';
 
     public function inventories()
     {

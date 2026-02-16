@@ -15,7 +15,7 @@ return new class extends Migration
         // Ini solusi untuk error "Table already exists" yang Anda alami tadi.
         Schema::dropIfExists('users');
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('mj_users', function (Blueprint $table) {
             $table->integer('id', true); // id int(11) NOT NULL AUTO_INCREMENT
             $table->string('username', 50)->default('0');
             $table->string('branch_id', 10)->default('0');
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('mj_users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

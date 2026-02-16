@@ -19,9 +19,13 @@ class PosController extends Controller
             $branchId = 1;
         }
         // Ambil produk yang stoknya > 0 di cabang tersebut
-        $products = Product::whereHas('inventories', function($q) use ($branchId) {
-            $q->where('branch_id', $branchId)->where('stock', '>', 0);
-        })->get();
+        // $products = Product::whereHas('inventories', function($q) use ($branchId) {
+        //     $q->where('branch_id', $branchId)->where('stock', '>', 0);
+        // })->get();
+
+        $products = Product::with(['inventories' =>function($query) use ($branchId) {
+            $query->where('branch_id', $branchId);
+        }])->get();
 
         return view('pos.index', compact('products'));
     }
@@ -35,6 +39,10 @@ class PosController extends Controller
 
         try {
             $branchId = auth()->user()->branch_id ?? 1;
+            $role = auth()->user()->role;
+            if($role == 'root'){
+                $branchId = 1;
+            }
             
             // Panggil perintah tunggal di Model
             $transaction = Transaction::createTransaction(

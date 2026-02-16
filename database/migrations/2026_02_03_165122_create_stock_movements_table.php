@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stock_movements', function (Blueprint $table) {
+        Schema::create('mj_stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->constrained('master_branch');
-            $table->foreignId('product_id')->constrained('product');
+            $table->foreignId('branch_id')->constrained('mj_master_branch');
+            $table->foreignId('product_id')->constrained('mj_master_product');
             $table->enum('type', ['IN', 'OUT', 'ADJUSTMENT']);
             $table->integer('qty');
             $table->string('reference')->nullable(); // trx code / manual input
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stock_movements');
+        Schema::dropIfExists('mj_stock_movements');
     }
 };

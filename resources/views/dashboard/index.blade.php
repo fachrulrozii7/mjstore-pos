@@ -11,7 +11,8 @@
 </head>
 <body class="bg-gray-50 font-[Instrument Sans] antialiased"> -->
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> -->
+<div class="max-w-7xl mx-auto font-[Instrument Sans]">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">MJ Department Store</h1>

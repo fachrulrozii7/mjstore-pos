@@ -12,7 +12,7 @@ return new class extends Migration
     // database/migrations/xxxx_create_role_permissions_table.php
     public function up()
     {
-        Schema::create('user_settings', function (Blueprint $table) {
+        Schema::create('mj_user_settings', function (Blueprint $table) {
             $table->id();
             $table->string('role'); // kasir, manager, root
             $table->string('menu_key'); // dashboard, pos, inventory, reports
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_permissions');
+        Schema::dropIfExists('mj_user_settings');
     }
 };

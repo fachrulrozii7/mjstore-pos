@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventory', function (Blueprint $table) {
+        Schema::create('mj_inventory', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->constrained('master_branch');
-            $table->foreignId('product_id')->constrained('product');
+            $table->foreignId('branch_id')->constrained('mj_master_branch');
+            $table->foreignId('product_id')->constrained('mj_master_product');
             $table->integer('stock')->default(0);
             $table->integer('min_stock')->default(0);
             $table->timestamp('last_stock_update')->nullable();
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inventory');
+        Schema::dropIfExists('mj_inventory');
     }
 };

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('master_branch', function (Blueprint $table) {
+        Schema::create('mj_master_branch', function (Blueprint $table) {
             $table->id();
             $table->string('branch_id', 20)->unique();
             $table->string('branch_name', 100);
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_branch');
+        Schema::dropIfExists('mj_master_branch');
     }
 };

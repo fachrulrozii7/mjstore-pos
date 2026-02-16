@@ -9,16 +9,26 @@
                 <div class="p-6 border-b border-gray-50 bg-gray-50/50">
                     <div class="relative">
                         <input type="text" 
-                            x-ref="barcodeInput"
-                            @keydown.enter.prevent="findProduct($el.value)"
-                            placeholder="Scan Barcode atau Ketik Product ID di sini..." 
-                            class="w-full pl-12 pr-4 py-4 bg-white border-2 border-blue-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 text-lg font-bold tracking-tight transition-all">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 17h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                        </div>
-                    </div>
-                </div>
+        x-ref="barcodeInput"
+        @keydown.enter.prevent="findProduct($el.value); $el.value = ''" 
+        placeholder="Scan Barcode atau Ketik Product ID..." 
+        class="w-full pl-12 pr-16 py-4 bg-white border-2 border-blue-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 text-lg font-bold transition-all">
+    
+    <button @click="showLookup = true; $nextTick(() => $refs.searchField.focus())" 
+            type="button" 
+            class="absolute right-2 top-2 bottom-2 px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all flex items-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+    </button>
 
+    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-500">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 17h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+        </svg>
+    </div>
+        </div>
+            </div>
                 <div class="overflow-y-auto h-[500px]">
                     <table class="w-full text-left">
                         <thead class="bg-white text-gray-400 text-[10px] uppercase font-black tracking-widest sticky top-0 border-b border-gray-100">
@@ -91,13 +101,69 @@
             </div>
         </div>
     </div>
+
+    <div x-show="showLookup" 
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+        x-cloak
+        @keydown.window.escape="showLookup = false"
+        @keydown.window.f1.prevent="showLookup = true; $nextTick(() => $refs.searchField.focus())">
+        
+        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-100" @click.away="showLookup = false">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-black text-gray-900">Cari Produk (F1)</h3>
+                    <button @click="showLookup = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="relative mb-6">
+                    <input type="text" 
+                        x-ref="searchField"
+                        x-model="searchQuery"
+                        placeholder="Ketik nama atau id produk ..." 
+                        class="w-full px-8 py-5 bg-gray-50 border-none rounded-[1.5rem] focus:ring-4 focus:ring-blue-100 font-bold text-lg">
+                </div>
+
+                <div class="max-h-[400px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                    <template x-for="product in products.filter(p => p.product_name.toLowerCase().includes(searchQuery.toLowerCase()) || p.product_id.toLowerCase().includes(searchQuery.toLowerCase()))" :key="product.id">
+                        <div @click="addToCartFromLookup(product); showLookup = false; searchQuery = ''" 
+                            class="group flex items-center justify-between p-5 rounded-[1.5rem] cursor-pointer border-2 border-transparent hover:border-blue-500 hover:bg-blue-50 transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-blue-600 font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                    <span x-text="product.product_name.substring(0,1)"></span>
+                                </div>
+                                <div>
+                                    <p class="font-black text-gray-900 group-hover:text-blue-700" x-text="product.product_name"></p>
+                                    <p class="text-xs font-bold text-gray-400 tracking-widest" x-text="product.product_id"></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black text-blue-600 text-lg" x-text="formatCurrency(product.selling_price)"></p>
+                                <p class="text-[10px] font-black uppercase tracking-tighter" :class="getStock(product) > 5 ? 'text-gray-400' : 'text-red-500'">
+                                    Stok: <span x-text="getStock(product) || 0"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
+
 function scannerSystem() {
     return {
         cart: [],
         payment: 0,
+        showLookup: false,  // Perbaikan: Tambahkan ini agar tidak error
+        searchQuery: '',    // Perbaikan: Tambahkan ini agar tidak error
         products: @json($products), // Data produk dikirim dari controller
         
         init() {
@@ -107,6 +173,37 @@ function scannerSystem() {
                 if (e.key === 'F8') this.$refs.paymentInput.focus();
                 if (e.key === 'F10') this.processPayment();
             });
+        },
+
+        getStock(product) {
+            // Cek apakah product ada, inventory ada, dan merupakan array yang punya isi
+            console.log('apya', product)
+            if (product && product.inventories && Array.isArray(product.inventories) && product.inventories.length > 0) {
+                return product.inventories[0].stock || 0;
+            }
+            return 0; // Kembalikan 0 jika tidak ada data stok
+        },
+
+        addToCartFromLookup(product) {
+            // Cek apakah produk sudah ada di keranjang
+            let existingItem = this.cart.find(item => item.id === product.id);
+
+            if (existingItem) {
+                existingItem.qty++;
+                existingItem.subtotal = existingItem.qty * existingItem.price;
+            } else {
+                this.cart.push({
+                    id: product.id,
+                    product_id: product.product_id,
+                    name: product.product_name,
+                    price: product.selling_price,
+                    qty: 1,
+                    subtotal: product.selling_price
+                });
+            }
+            
+            // Beri notifikasi kecil atau fokus kembali ke input barcode
+            this.$nextTick(() => this.$refs.barcodeInput.focus());
         },
 
         findProduct(code) {

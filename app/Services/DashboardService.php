@@ -14,7 +14,7 @@ class DashboardService
     /**
      * Helper to apply common filters to queries
      */
-    protected static function applyFilters($query, $filters, $tablePrefix = 'transaction')
+    protected static function applyFilters($query, $filters, $tablePrefix = 'mj_transaction')
     {
         if (!empty($filters['branch_id'])) {
             $query->where($tablePrefix . '.branch_id', $filters['branch_id']);
@@ -33,13 +33,13 @@ class DashboardService
     public static function getBestSellingProducts($filters = [], $limit = 10)
     {
         $query = TransactionDetail::with('product')
-            ->join('transaction', 'transaction.id', '=', 'transaction_detail.transaction_id')
+            ->join('mj_transaction', 'mj_transaction.id', '=', 'mj_transaction_detail.transaction_id')
             ->select(
-                'transaction_detail.product_id',
-                DB::raw('SUM(transaction_detail.qty) as total_qty'),
-                DB::raw('SUM(transaction_detail.subtotal) as total_sales')
+                'mj_transaction_detail.product_id',
+                DB::raw('SUM(mj_transaction_detail.qty) as total_qty'),
+                DB::raw('SUM(mj_transaction_detail.subtotal) as total_sales')
             )
-            ->groupBy('transaction_detail.product_id')
+            ->groupBy('mj_transaction_detail.product_id')
             ->orderByDesc('total_qty')
             ->limit($limit);
 
@@ -77,10 +77,10 @@ class DashboardService
 
     public static function getTotalProfit($filters = [])
     {
-        $query = TransactionDetail::join('transaction', 'transaction.id', '=', 'transaction_detail.transaction_id')
-            ->join('product', 'product.id', '=', 'transaction_detail.product_id')
-            ->where('transaction.status', 'PAID')
-            ->selectRaw('SUM((transaction_detail.price - product.purchase_price) * transaction_detail.qty) as total_profit');
+        $query = TransactionDetail::join('mj_transaction', 'mj_transaction.id', '=', 'mj_transaction_detail.transaction_id')
+            ->join('mj_master_product', 'mj_master_product.id', '=', 'mj_transaction_detail.product_id')
+            ->where('mj_transaction.status', 'PAID')
+            ->selectRaw('SUM((mj_transaction_detail.price - mj_master_product.purchase_price) * mj_transaction_detail.qty) as total_profit');
 
         $result = self::applyFilters($query, $filters)->first();
         return $result->total_profit ?? 0;
@@ -88,14 +88,14 @@ class DashboardService
 
     public static function getProfitPerBranch($filters = [])
     {
-        $query = TransactionDetail::join('transaction', 'transaction.id', '=', 'transaction_detail.transaction_id')
-            ->join('product', 'product.id', '=', 'transaction_detail.product_id')
+        $query = TransactionDetail::join('mj_transaction', 'mj_transaction.id', '=', 'mj_transaction_detail.transaction_id')
+            ->join('mj_master_product', 'mj_master_product.id', '=', 'mj_transaction_detail.product_id')
             ->select(
-                'transaction.branch_id',
-                DB::raw('SUM((transaction_detail.price - product.purchase_price) * transaction_detail.qty) as total_profit')
+                'mj_transaction.branch_id',
+                DB::raw('SUM((mj_transaction_detail.price - mj_master_product.purchase_price) * mj_transaction_detail.qty) as total_profit')
             )
-            ->where('transaction.status', 'PAID')
-            ->groupBy('transaction.branch_id');
+            ->where('mj_transaction.status', 'PAID')
+            ->groupBy('mj_transaction.branch_id');
 
         return self::applyFilters($query, $filters)->get();
     }
@@ -103,30 +103,30 @@ class DashboardService
     public static function getSlowMovingProducts($filters = [], $limit = 10)
     {
         // Mengambil semua produk dan menjumlahkan qty terjual dari tabel transaction_details
-        $query = Product::leftJoin('transaction_detail', 'product.id', '=', 'transaction_detail.product_id')
-            ->leftJoin('transaction', 'transaction.id', '=', 'transaction_detail.transaction_id')
+        $query = Product::leftJoin('mj_transaction_detail', 'mj_master_product.id', '=', 'mj_transaction_detail.product_id')
+            ->leftJoin('mj_transaction', 'mj_transaction.id', '=', 'mj_transaction_detail.transaction_id')
             ->select(
-                'product.product_name',
-                DB::raw('COALESCE(SUM(transaction_detail.qty), 0) as total_qty'),
-                DB::raw('COALESCE(SUM(transaction_detail.subtotal), 0) as total_sales')
+                'mj_master_product.product_name',
+                DB::raw('COALESCE(SUM(mj_transaction_detail.qty), 0) as total_qty'),
+                DB::raw('COALESCE(SUM(mj_transaction_detail.subtotal), 0) as total_sales')
             )
             // Filter status PAID agar pembatalan tidak dihitung sebagai penjualan
             ->where(function($q) {
-                $q->where('transaction.status', 'PAID')
-                ->orWhereNull('transaction.status');
+                $q->where('mj_transaction.status', 'PAID')
+                ->orWhereNull('mj_transaction.status');
             });
 
         // Terapkan filter cabang jika ada
         if (!empty($filters['branch_id'])) {
-            $query->where('transaction.branch_id', $filters['branch_id']);
+            $query->where('mj_transaction.branch_id', $filters['branch_id']);
         }
 
         // Terapkan filter tanggal jika ada
         if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
-            $query->whereBetween('transaction.transaction_date', [$filters['start_date'].' 00:00:00', $filters['end_date'].' 23:59:59']);
+            $query->whereBetween('mj_transaction.transaction_date', [$filters['start_date'].' 00:00:00', $filters['end_date'].' 23:59:59']);
         }
 
-        return $query->groupBy('product.id', 'product.product_name')
+        return $query->groupBy('mj_master_product.id', 'mj_master_product.product_name')
             ->orderBy('total_qty', 'asc') // Urutkan dari yang paling sedikit
             ->limit($limit)
             ->get();

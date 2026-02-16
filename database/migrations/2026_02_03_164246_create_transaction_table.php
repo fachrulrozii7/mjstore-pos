@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaction', function (Blueprint $table) {
+        Schema::create('mj_transaction', function (Blueprint $table) {
             $table->id();
             $table->string('transaction_id', 50)->unique();
-            $table->foreignId('branch_id')->constrained('master_branch');
+            $table->foreignId('branch_id')->constrained('mj_master_branch');
             $table->dateTime('transaction_date');
+            $table->string('user_id')->nullable();
             $table->decimal('total_amount', 15, 2);
             $table->enum('payment_method', ['cash', 'qris', 'debit', 'credit']);
             $table->decimal('paid_amount', 15, 2);
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaction');
+        Schema::dropIfExists('mj_transaction');
     }
 };

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use \App\Models\RolePermission;
 use Symfony\Component\HttpFoundation\Response;
-use App\Http\Controllers\UserController;
 
 class RoleMiddleware
 {

@@ -15,8 +15,8 @@ class TransactionSeeder extends Seeder
     public function run(): void
     {
 
-        $branches = DB::table('master_branch')->get();
-        $products = DB::table('product')->get();
+        $branches = DB::table('mj_master_branch')->get();
+        $products = DB::table('mj_master_product')->get();
 
         foreach (range(1, 50) as $i) {
 
@@ -24,7 +24,7 @@ class TransactionSeeder extends Seeder
             $trxCode = 'TRX-'.Str::upper(Str::random(8));
             $total = 0;
 
-            DB::table('transaction')->insert([
+            DB::table('mj_transaction')->insert([
                 'transaction_id'=>$trxCode,
                 'branch_id'=>$branch->id,
                 'transaction_date'=>now()->subDays(rand(0,30)),
@@ -44,7 +44,7 @@ class TransactionSeeder extends Seeder
                 $subtotal = $qty * $product->selling_price;
                 $total += $subtotal;
 
-                DB::table('transaction_detail')->insert([
+                DB::table('mj_transaction_detail')->insert([
                     'transaction_id'=>$trxId,
                     'product_id'=>$product->id,
                     'qty'=>$qty,
@@ -54,7 +54,7 @@ class TransactionSeeder extends Seeder
                     'updated_at'=>now()
                 ]);
 
-                DB::table('stock_movements')->insert([
+                DB::table('mj_stock_movements')->insert([
                     'branch_id'=>$branch->id,
                     'product_id'=>$product->id,
                     'type'=>'OUT',
@@ -65,7 +65,7 @@ class TransactionSeeder extends Seeder
                 ]);
             }
 
-            DB::table('transaction')->where('id',$trxId)->update([
+            DB::table('mj_transaction')->where('id',$trxId)->update([
                 'total_amount'=>$total,
                 'paid_amount'=>$total,
             ]);

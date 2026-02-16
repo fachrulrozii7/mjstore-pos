@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaction_detail', function (Blueprint $table) {
+        Schema::create('mj_transaction_detail', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained('transaction')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('product');
+            $table->foreignId('transaction_id')->constrained('mj_transaction')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('mj_master_product');
             $table->integer('qty');
             $table->decimal('price', 15, 2);
             $table->decimal('subtotal', 15, 2);
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaction_detail');
+        Schema::dropIfExists('mj_transaction_detail');
     }
 };

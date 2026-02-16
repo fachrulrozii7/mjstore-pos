@@ -13,12 +13,12 @@ class InventorySeeder extends Seeder
      */
     public function run(): void
     {
-        $branches = DB::table('master_branch')->get();
-        $products = DB::table('product')->get();
+        $branches = DB::table('mj_master_branch')->get();
+        $products = DB::table('mj_master_product')->get();
 
         foreach ($branches as $branch) {
             foreach ($products as $product) {
-                DB::table('inventory')->insert([
+                DB::table('mj_inventory')->insert([
                     'branch_id' => $branch->id,
                     'product_id' => $product->id,
                     'stock' => rand(10, 100),

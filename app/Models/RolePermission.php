@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RolePermission extends Model
 {
     protected $fillable = ['role', 'menu_key', 'is_active'];
-    protected $table = 'user_settings';
+    protected $table = 'mj_user_settings';
     // Fungsi pembantu untuk cek akses
 
     // Cast kolom menu_keys otomatis menjadi array

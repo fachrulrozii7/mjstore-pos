@@ -13,7 +13,7 @@ class MasterBranchSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('master_branch')->insert([
+        DB::table('mj_master_branch')->insert([
             [
                 'branch_id' => 'CBG-01',
                 'branch_name' => 'MJ Depstore Tebo',
