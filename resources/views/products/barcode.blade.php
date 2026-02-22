@@ -44,7 +44,7 @@
 <body onload="window.print()">
     @for ($i = 0; $i < $quantity; $i++)
         <div class="label-page">
-            <div class="brand">{{ $product->brand ?? 'MJ STORE' }}</div>
+            <div class="brand">{{ $branch->branch_name ?? 'MJ STORE' }}</div>
             <div class="product-name">{{ $product->product_name }}</div>
             
             <svg class="barcode-item" data-value="{{ $product->product_id }}"></svg>

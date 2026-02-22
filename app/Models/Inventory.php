@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inventory extends Model
 {
+    use SoftDeletes;
     protected $table = 'mj_inventory';
     protected $fillable = [
         'branch_id',
@@ -32,6 +34,7 @@ class Inventory extends Model
     public function scopeWithProductData($query)
     {
         return $query->join('mj_master_product', 'mj_inventory.product_id', '=', 'mj_master_product.id')
+                     ->where('mj_master_product.is_active','=','1')
                      ->select('mj_inventory.*', 'mj_master_product.product_name', 'mj_master_product.product_id', 'mj_master_product.unit', 'mj_master_product.category_id');
     }
 

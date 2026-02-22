@@ -30,6 +30,16 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:products'])->group(function () {
         Route::resource('products', ProductController::class);
         Route::get('/products/{id}/barcode', [ProductController::class, 'printBarcode'])->name('products.barcode');
+        Route::get('/', [ProductController::class, 'index'])->name('products.index');
+
+        // Rute Recycle Bin (Letakkan di atas rute {id} agar tidak bentrok)
+        Route::get('/trash', [ProductController::class, 'trashed'])->name('products.trashed');
+        Route::post('/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+        Route::delete('/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete');
+
+        // Route menu edit product
+        Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');    
 
         Route::prefix('master')->group(function () {
             Route::get('/', [MasterDataController::class, 'index'])->name('master.index');
@@ -57,19 +67,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:dashboard'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         // Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    });
-
-    route::middleware(['role:category'])->group(function(){
-        Route::get('/', [MasterDataController::class, 'index'])->name('index');
-        // Category Routes
-        Route::post('/category', [MasterDataController::class, 'storeCategory'])->name('category.store');
-        Route::put('/category/{id}', [MasterDataController::class, 'updateCategory'])->name('category.update');
-        Route::delete('/category/{id}', [MasterDataController::class, 'destroyCategory'])->name('category.destroy');
-
-        // Brand Routes
-        Route::post('/brand', [MasterDataController::class, 'storeBrand'])->name('brand.store');
-        Route::put('/brand/{id}', [MasterDataController::class, 'updateBrand'])->name('brand.update');
-        Route::delete('/brand/{id}', [MasterDataController::class, 'destroyBrand'])->name('brand.destroy'); 
     });
 
     Route::middleware(['auth', 'role:root'])->group(function () {

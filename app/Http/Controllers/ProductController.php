@@ -29,6 +29,7 @@ class ProductController extends Controller
         // Kita hanya ambil yang is_active saja agar dropdown-nya rapi
         $categories = Category::where('is_active', true)->orderBy('name', 'asc')->get();
         $brands = Brand::where('is_active', true)->orderBy('name', 'asc')->get();
+        // echo 'hi'.$products;die();
         return view('products.index', compact('products','categories', 'brands'));
     }
 
@@ -39,8 +40,8 @@ class ProductController extends Controller
             // 'product_id' => 'required|string|unique:product,product_id',
             // 'unit'     => 'required',
             // 'category' => 'required',
-            'category_id' => 'required|exists:mj_master_categories,id',
-            'brand_id' => 'nullable|numeric',       // Menyimpan ID, bukan teks
+            'category_id' => 'nullable',
+            'brand_id' => 'nullable',
             'purchase_price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             // 'brand' => 'nullable|string',
@@ -53,7 +54,22 @@ class ProductController extends Controller
 
         try {
             return DB::transaction(function () use ($request) {
-                // 2. Generate Product ID Robust
+                // 1. Logic Cerdas untuk Brand
+                $brandId = $request->brand_id;
+                // Jika input bukan angka, berarti itu merk baru yang diketik user
+                if (!is_numeric($brandId)) {
+                    $newBrand = Brand::firstOrCreate(['name' => ucwords($brandId)]);
+                    $brandId = $newBrand->id;
+                }
+
+                // 2. Logic Cerdas untuk Kategori
+                $categoryId = $request->category_id;
+                if (!is_numeric($categoryId)) {
+                    $newCat = Category::firstOrCreate(['name' => ucwords($categoryId)]);
+                    $categoryId = $newCat->id;
+                }            
+
+                // Generate Product ID Robust
                 // Format: MJ-YYMMDD-XXXX (MJ-260212-0001)
                 $prefix = 'MJ';
                 $date = now()->format('ymd'); 
@@ -79,8 +95,8 @@ class ProductController extends Controller
                 $product = Product::create([
                     'product_id' => $generatedId,
                     'product_name' => $request->product_name,
-                    'brand_id' => $request->brand_id,
-                    'category_id' => $request->category_id,
+                    'brand_id' => $brandId,
+                    'category_id' => $categoryId,
                     'color' => $request->color,
                     'size' => $request->size,
                     // 'unit' => $request->unit ?? 1,
@@ -119,13 +135,104 @@ class ProductController extends Controller
     public function printBarcode(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        
+        $user = auth()->user();
+        $branch = MasterBranch::find($user->branch_id);
         // Ambil jumlah cetak dari input, default-nya 1 jika tidak diisi
         $quantity = $request->query('qty', 1);
         
         // Validasi agar tidak cetak terlalu banyak sekaligus (misal max 100)
         $quantity = min(max($quantity, 1), 100);
 
-        return view('products.barcode', compact('product', 'quantity'));
+        return view('products.barcode', compact('product', 'quantity', 'branch'));
+    }
+
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update([
+            'is_active' => 0,
+        ]);
+        $product->delete(); // Sekarang ini adalah Soft Delete otomatis
+        
+
+        return redirect()->back()->with('success', 'Produk berhasil dipindahkan ke tempat sampah.');
+    }
+
+    public function trashed()
+    {
+        // Mengambil hanya produk yang sudah di-soft delete
+        $products = Product::onlyTrashed()->paginate(10);
+        return view('products.trashed', compact('products'));
+    }
+
+    public function restore($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        $product->restore(); // Mengembalikan data
+
+        return redirect()->route('products.index')->with('success', 'Produk berhasil dikembalikan ke daftar aktif.');
+    }
+
+    public function forceDelete($id)
+    {
+        return DB::transaction(function () use ($id) {
+            // 1. Cari produknya (termasuk yang di sampah)
+            $product = Product::withTrashed()->findOrFail($id);
+            
+            // 2. Hapus SEMUA inventory yang nyangkut ke produk ini secara manual
+            // Kita pakai query builder agar langsung eksekusi ke DB
+            DB::table('mj_inventory')->where('product_id', $product->id)->delete();
+            
+            // 3. Sekarang baru hapus permanen produknya
+            $product->forceDelete(); 
+
+            return redirect()->back()->with('success', 'Produk dan data stok berhasil dimusnahkan.');
+        });
+    }
+
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        $categories = Category::all();
+        $brands = Brand::all();
+
+        return view('products.edit', compact('product', 'categories', 'brands'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'purchase_price' => 'required|numeric',
+            'selling_price' => 'required|numeric',
+        ]);
+
+        $product = Product::findOrFail($id);
+
+        // Logic Cerdas untuk Brand (Jika input baru/teks)
+        $brandId = $request->brand_id;
+        if (!is_numeric($brandId) && $brandId != null) {
+            $brand = Brand::firstOrCreate(['name' => strtoupper(trim($brandId))]);
+            $brandId = $brand->id;
+        }
+
+        // Logic Cerdas untuk Kategori
+        $categoryId = $request->category_id;
+        if (!is_numeric($categoryId) && $categoryId != null) {
+            $cat = Category::firstOrCreate(['name' => trim($categoryId)]);
+            $categoryId = $cat->id;
+        }
+
+        $product->update([
+            'product_name' => $request->product_name,
+            'brand_id' => $brandId,
+            'category_id' => $categoryId,
+            'purchase_price' => $request->purchase_price,
+            'selling_price' => $request->selling_price,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+            // Tambahkan field size/color jika ada
+        ]);
+
+        return redirect()->route('products.index')->with('success', 'Data produk berhasil diperbarui.');
     }
 }

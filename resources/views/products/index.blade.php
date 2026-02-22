@@ -16,10 +16,16 @@
             <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">📦 Data Produk</h1>
             <p class="text-sm text-gray-400 mt-1">Kelola stok, harga, dan informasi barang di seluruh cabang.</p>
         </div>
-        <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg shadow-blue-100">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Tambah Produk
-        </button>
+        <div class="flex items-center gap-3">
+    <a href="{{ route('products.trashed') }}" class="p-2.5 text-gray-400 hover:text-red-500 bg-gray-50 rounded-xl transition-all" title="Lihat Tempat Sampah">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    </a>
+    
+    <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Tambah Produk
+    </button>
+</div>
     </div>
 
     <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-8">
@@ -83,15 +89,23 @@
                         </td>
                         <td class="px-8 py-5">
                             <div class="flex items-center justify-center gap-1">
-                                <button class="p-2 text-gray-300 hover:text-blue-600 transition-colors" title="Edit">
+                                <!-- <button class="p-2 text-gray-300 hover:text-blue-600 transition-colors" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                </button> -->
+                                <button 
+                                    onclick="window.location.href='{{ route('products.edit', $product->id) }}'"
+                                    class="p-2 text-gray-300 hover:text-blue-600 transition-colors " 
+                                    title="Edit" style="cursor: pointer">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
                                 </button>
-                                <button @click="let qty = prompt('Jumlah label:', '1'); if(qty) window.open('{{ route('products.barcode', $product->id) }}?qty=' + qty, '_blank')" class="p-2 text-gray-300 hover:text-gray-900 transition-colors" title="Cetak Barcode">
+                                <button @click="let qty = prompt('Jumlah label:', '1'); if(qty) window.open('{{ route('products.barcode', $product->id) }}?qty=' + qty, '_blank')" class="p-2 text-gray-300 hover:text-gray-900 transition-colors" style="cursor: pointer" title="Cetak Barcode">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                 </button>
                                 <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Hapus produk?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="p-2 text-gray-300 hover:text-red-600 transition-colors">
+                                    <button type="submit" class="p-2 text-gray-300 hover:text-red-600 transition-colors" style="cursor: pointer">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 </form>
@@ -130,7 +144,7 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-6">
-                    <div>
+                    <!-- <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Pilih Merk (Brand)</label>
                         <select name="brand_id" required class="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-sm">
                             <option value="">-- Pilih Brand --</option>
@@ -147,7 +161,27 @@
                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
+                    </div> -->
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Kategori</label>
+                        <select id="select-category" name="category_id" class="tom-tailwind w-full" placeholder="Cari kategori..." autocomplete="off">
+                            <option value="">-- Pilih Kategori --</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Brand / Merk</label>
+                        <select id="select-brand" name="brand_id" class="tom-tailwind w-full" placeholder="Cari merk..." autocomplete="off">
+                            <option value="">-- Pilih Brand --</option>
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                 </div>
 
                 <div class="grid grid-cols-2 gap-6">
@@ -195,4 +229,76 @@
 </div>
 
 <style> [x-cloak] { display: none !important; } </style>
+<style>
+    .tom-clean + .ts-wrapper .ts-control {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: #f9fafb;
+}
+</style>
+<style>
+/* Wrapper full width */
+.tom-tailwind + .ts-wrapper {
+    width: 100%;
+}
+
+/* Main control */
+.tom-tailwind + .ts-wrapper .ts-control {
+    background-color: #f9fafb; /* bg-gray-50 */
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 1rem; /* rounded-2xl */
+    padding: 0.875rem 1.25rem; /* py-3.5 px-5 */
+    font-weight: 700;
+    font-size: 0.875rem; /* text-sm */
+}
+
+/* Remove default border */
+.tom-tailwind + .ts-wrapper .ts-control input {
+    font-weight: 700;
+}
+
+/* Focus ring like Tailwind */
+.tom-tailwind + .ts-wrapper.focus .ts-control {
+    box-shadow: 0 0 0 2px #040404 !important; /* focus:ring-blue-500 */
+    background-color: #f9fafb;
+}
+
+/* Dropdown style */
+.tom-tailwind + .ts-wrapper .ts-dropdown {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    font-weight: 600;
+}
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Konfigurasi untuk Brand
+        new TomSelect("#select-brand", {
+            create: true, // Mengizinkan input teks baru yang tidak ada di list
+            persist: false,
+            createFilter: function(input) {
+                return input.length >= 2; // Minimal 2 karakter untuk buat merk baru
+            },
+            render: {
+                option_create: function(data, escape) {
+                    return '<div class="create">Tambah merk baru: <strong>' + escape(data.input) + '</strong>...</div>';
+                }
+            }
+        });
+
+        // Konfigurasi untuk Kategori
+        new TomSelect("#select-category", {
+            create: true,
+            persist: false,
+            render: {
+                option_create: function(data, escape) {
+                    return '<div class="create">Tambah kategori baru: <strong>' + escape(data.input) + '</strong>...</div>';
+                }
+            }
+        });
+    });
+</script>
 @endsection

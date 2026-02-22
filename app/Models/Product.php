@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
-use App\Models\Brand;
+use App\Models\Brand; 
 
 class Product extends Model
 {
+    use SoftDeletes;
     use HasFactory;
 
     protected $table = 'mj_master_product';
@@ -17,8 +19,8 @@ class Product extends Model
         'product_name',
         'product_id',
         'unit',
-        'category',
-        'brand',
+        'category_id',
+        'brand_id',
         'color',
         'size', 
         'purchase_price',
@@ -72,4 +74,24 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class, 'brand_id');
     }
+
+    protected static function booted()
+    {
+        static::forceDeleting(function ($product) {
+            // Kita pakai get() dulu baru delete untuk memastikan relasi terpanggil
+            // Jika Inventory TIDAK pakai SoftDeletes, gunakan delete()
+            // Jika Inventory PAKAI SoftDeletes, gunakan forceDelete()
+            $product->inventory()->each(function($inventory) {
+                $inventory->delete(); 
+            });
+        });
+    }
+
+    public function inventory()
+    {
+        // Berdasarkan error kamu, FK merujuk ke 'id', 
+        // jadi biarkan standar seperti ini:
+        return $this->hasMany(Inventory::class, 'product_id', 'id');
+    }
+    
 }
